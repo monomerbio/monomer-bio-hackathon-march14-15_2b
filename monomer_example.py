@@ -25,7 +25,8 @@ Error handling:
 import asyncio
 import logging
 import os
-from pylabrobot.liquid_handling import LiquidHandler, OpentronsOT2Backend
+from pylabrobot.liquid_handling import LiquidHandler
+from pylabrobot.liquid_handling.backends import OpentronsOT2Backend, OpentronsOT2Simulator
 from pylabrobot.liquid_handling.standard import Mix
 from pylabrobot.resources import (
     OTDeck,
@@ -45,10 +46,16 @@ if not OT2_HOST:
     logger.error("OT2_HOST environment variable is not set")
     raise ValueError(
         "OT2_HOST environment variable is not set. "
-        "Set it to your robot's IP, e.g. in the terminal: export OT2_HOST=192.168.1.1"
+        "Set it to your robot's IP, or use 'simulate' for offline testing."
     )
 deck = OTDeck()
-backend = OpentronsOT2Backend(host=OT2_HOST)
+if OT2_HOST == "simulate":
+    backend = OpentronsOT2Simulator(
+        left_pipette_name="p300_single_gen2",
+        right_pipette_name="p1000_single_gen2",
+    )
+else:
+    backend = OpentronsOT2Backend(host=OT2_HOST)
 lh = LiquidHandler(backend=backend, deck=deck)
 
 tip_200 = load_ot_tip_rack("opentrons_96_filtertiprack_200ul", "200uL")
