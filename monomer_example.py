@@ -5,6 +5,7 @@ Demonstrates: setup deck, pick up tips, aspirate/dispense (with mixing), return 
 Transfer flow: 24-well plate → 96-well deep → 96-well flat. Uses both tip types
 (P300 left/channel 0, P1000 right/channel 1). Mixing is done by passing
 mix=[Mix(volume_µL, repetitions, flow_rate_µL/s)] to aspirate() and/or dispense().
+Pipetting height is set via liquid_height (mm above well bottom).
 
 Deck layout (slots):
   Slot 1: 24-well deepwell plate, 10 mL (source)
@@ -57,37 +58,54 @@ deck.assign_child_at_slot(plate_96_flat, 3)
 async def main():
     await lh.setup(skip_home=False)
 
-    # ---- P1000: 24-well → 96-deepwell (with mix at source) ----
-    await lh.pick_up_tips(tip_1000["A1"], use_channels=[1])
-    await lh.aspirate(
-        plate_24_deep["A1"],
-        vols=[200],
-        mix=[Mix(volume=200, repetitions=3, flow_rate=400)],
-        use_channels=[1],
-    )
-    await lh.dispense(
-        plate_96_deep["A1"],
-        vols=[200],
-        use_channels=[1],
-    )
-    await lh.return_tips()
+    try:
+        # ---- P1000: 24-well → 96-deepwell (with mix at source) ----
+        await lh.pick_up_tips(tip_1000["A1"], use_channels=[1])
+        await lh.aspirate(
+            plate_24_deep["A1"],
+            vols=[200],
+            mix=[Mix(volume=200, repetitions=3, flow_rate=400)],
+            liquid_height=[1.0],
+            use_channels=[1],
+        )
+        await lh.dispense(
+            plate_96_deep["A1"],
+            vols=[200],
+            liquid_height=[1.0],
+            use_channels=[1],
+        )
+        await lh.return_tips()
 
-    # ---- P300: 96-deepwell → 96-flat (with mix at source) ----
-    await lh.pick_up_tips(tip_300["A1"], use_channels=[0])
-    await lh.aspirate(
-        plate_96_deep["A1"],
-        vols=[100],
-        mix=[Mix(volume=100, repetitions=3, flow_rate=400)],
-        use_channels=[0],
-    )
-    await lh.dispense(
-        plate_96_flat["A1"],
-        vols=[100],
-        use_channels=[0],
-    )
-    await lh.return_tips()
+        # ---- P300: 96-deepwell → 96-flat (with mix at source) ----
+        await lh.pick_up_tips(tip_300["A1"], use_channels=[0])
+        await lh.aspirate(
+            plate_96_deep["A1"],
+            vols=[100],
+            mix=[Mix(volume=100, repetitions=3, flow_rate=400)],
+            liquid_height=[1.0],
+            use_channels=[0],
+        )
+        await lh.dispense(
+            plate_96_flat["A1"],
+            vols=[100],
+            liquid_height=[1.0],
+            use_channels=[0],
+        )
+        await lh.return_tips()
 
-    await backend.home()
+        await backend.home()
+
+    except RuntimeError as e:
+        # Cleanup: discard any mounted tips to waste and home
+        try:
+            await lh.discard_tips()
+        except Exception:
+            pass  # no tips mounted or discard failed
+        try:
+            await backend.home()
+        except Exception:
+            pass
+        raise RuntimeError(str(e)) from e
 
 
 if __name__ == "__main__":
