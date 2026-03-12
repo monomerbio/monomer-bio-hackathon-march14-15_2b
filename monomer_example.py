@@ -23,6 +23,7 @@ Error handling:
   goes wrong.
 """
 import asyncio
+import logging
 import os
 from pylabrobot.liquid_handling import LiquidHandler, OpentronsOT2Backend
 from pylabrobot.liquid_handling.standard import Mix
@@ -34,11 +35,14 @@ from pylabrobot.resources import (
 )
 from pylabrobot.resources.opentrons.load import load_ot_tip_rack
 
+logger = logging.getLogger(__name__)
+
 # -----------------------------------------------------------------------------
 # Deck setup
 # -----------------------------------------------------------------------------
 OT2_HOST = os.environ.get("OT2_HOST")
 if not OT2_HOST:
+    logger.error("OT2_HOST environment variable is not set")
     raise ValueError(
         "OT2_HOST environment variable is not set. "
         "Set it to your robot's IP, e.g. in the terminal: export OT2_HOST=192.168.1.1"
@@ -61,21 +65,24 @@ deck.assign_child_at_slot(plate_96_flat, 3)
 
 async def cleanup():
     """Discard any mounted tips to waste and home. Used after error or cancel."""
+    logger.info("Cleanup: discarding tips and homing")
     try:
         await lh.discard_tips()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Could not discard tips: %s — eject tips manually if needed", e)
     try:
         await backend.home()
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("Home during cleanup failed: %s", e)
 
 
 async def run_transfers():
     """Run the full pipetting protocol. Raises on error; caller handles cleanup."""
+    logger.info("Starting protocol: setup (homing)")
     await lh.setup(skip_home=False)
 
     # P1000: 24-well → 96-deepwell (with mix at source)
+    logger.info("Transfer 1 (P1000): 24-well A1 → 96-deep A1, 200 µL with mix")
     await lh.pick_up_tips(tip_1000["A1"], use_channels=[1])
     await lh.aspirate(
         plate_24_deep["A1"],
@@ -93,6 +100,7 @@ async def run_transfers():
     await lh.return_tips()
 
     # P300: 96-deepwell → 96-flat (with mix at source)
+    logger.info("Transfer 2 (P300): 96-deep A1 → 96-flat A1, 100 µL with mix")
     await lh.pick_up_tips(tip_300["A1"], use_channels=[0])
     await lh.aspirate(
         plate_96_deep["A1"],
@@ -109,13 +117,21 @@ async def run_transfers():
     )
     await lh.return_tips()
 
+    logger.info("Protocol complete: homing")
     await backend.home()
 
 
 async def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+    )
     try:
         await run_transfers()
+        logger.info("Protocol finished successfully")
     except BaseException:
+        logger.warning("Protocol interrupted or failed; running cleanup")
         await cleanup()
         raise
 
