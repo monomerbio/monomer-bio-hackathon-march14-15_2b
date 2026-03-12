@@ -16,6 +16,11 @@ Deck layout (slots):
 
 IMPORTANT: On the OT-2 dual pipette, pass use_channels=[0] for left (P300) or
 use_channels=[1] for right (P1000). Tip rack and pipette must match.
+
+Error handling:
+  On any exception or Ctrl+C, the script discards any mounted tips to waste, homes
+  the robot, then re-raises the error. This keeps the robot in a safe state when something
+  goes wrong.
 """
 import asyncio
 import os
@@ -54,58 +59,65 @@ deck.assign_child_at_slot(plate_24_deep, 1)
 deck.assign_child_at_slot(plate_96_deep, 2)
 deck.assign_child_at_slot(plate_96_flat, 3)
 
+async def cleanup():
+    """Discard any mounted tips to waste and home. Used after error or cancel."""
+    try:
+        await lh.discard_tips()
+    except Exception:
+        pass
+    try:
+        await backend.home()
+    except Exception:
+        pass
 
-async def main():
+
+async def run_transfers():
+    """Run the full pipetting protocol. Raises on error; caller handles cleanup."""
     await lh.setup(skip_home=False)
 
+    # P1000: 24-well → 96-deepwell (with mix at source)
+    await lh.pick_up_tips(tip_1000["A1"], use_channels=[1])
+    await lh.aspirate(
+        plate_24_deep["A1"],
+        vols=[200],
+        mix=[Mix(volume=200, repetitions=3, flow_rate=400)],
+        liquid_height=[1.0],
+        use_channels=[1],
+    )
+    await lh.dispense(
+        plate_96_deep["A1"],
+        vols=[200],
+        liquid_height=[1.0],
+        use_channels=[1],
+    )
+    await lh.return_tips()
+
+    # P300: 96-deepwell → 96-flat (with mix at source)
+    await lh.pick_up_tips(tip_300["A1"], use_channels=[0])
+    await lh.aspirate(
+        plate_96_deep["A1"],
+        vols=[100],
+        mix=[Mix(volume=100, repetitions=3, flow_rate=400)],
+        liquid_height=[1.0],
+        use_channels=[0],
+    )
+    await lh.dispense(
+        plate_96_flat["A1"],
+        vols=[100],
+        liquid_height=[1.0],
+        use_channels=[0],
+    )
+    await lh.return_tips()
+
+    await backend.home()
+
+
+async def main():
     try:
-        # ---- P1000: 24-well → 96-deepwell (with mix at source) ----
-        await lh.pick_up_tips(tip_1000["A1"], use_channels=[1])
-        await lh.aspirate(
-            plate_24_deep["A1"],
-            vols=[200],
-            mix=[Mix(volume=200, repetitions=3, flow_rate=400)],
-            liquid_height=[1.0],
-            use_channels=[1],
-        )
-        await lh.dispense(
-            plate_96_deep["A1"],
-            vols=[200],
-            liquid_height=[1.0],
-            use_channels=[1],
-        )
-        await lh.return_tips()
-
-        # ---- P300: 96-deepwell → 96-flat (with mix at source) ----
-        await lh.pick_up_tips(tip_300["A1"], use_channels=[0])
-        await lh.aspirate(
-            plate_96_deep["A1"],
-            vols=[100],
-            mix=[Mix(volume=100, repetitions=3, flow_rate=400)],
-            liquid_height=[1.0],
-            use_channels=[0],
-        )
-        await lh.dispense(
-            plate_96_flat["A1"],
-            vols=[100],
-            liquid_height=[1.0],
-            use_channels=[0],
-        )
-        await lh.return_tips()
-
-        await backend.home()
-
-    except RuntimeError as e:
-        # Cleanup: discard any mounted tips to waste and home
-        try:
-            await lh.discard_tips()
-        except Exception:
-            pass  # no tips mounted or discard failed
-        try:
-            await backend.home()
-        except Exception:
-            pass
-        raise RuntimeError(str(e)) from e
+        await run_transfers()
+    except BaseException:
+        await cleanup()
+        raise
 
 
 if __name__ == "__main__":
