@@ -147,7 +147,9 @@ This way the human reviewer opens Culture Monitor, sees the status label at a gl
 
 ### Sample Prompt
 
-Once your classification pipeline has produced per-well labels, you can use a prompt like the following to upload results via the MCP:
+Once your classification pipeline has produced per-well labels, you can use natural language to prompt the server to assign the appropriate labels and post relevant comments. 
+
+If you're feeling ambitious, you can use a prompt like the following to upload results via the MCP in a single shot:
 
 ```
 I have classification results for plate <PLATE_BARCODE>. For each well, I have a label
