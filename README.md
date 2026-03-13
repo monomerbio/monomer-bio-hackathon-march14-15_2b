@@ -205,7 +205,7 @@ The problem statement defines inputs, outputs, and integration points. Everythin
 
 ## Pitch Format
 
-**30 minutes total: pitch, demo, and judge questions.** How you allocate the time is up to you. You're building and pitching a product, not just a working pipeline.
+**10 minutes total: pitch and demo.** How you allocate the time is up to you. You're building and pitching a product, not just a working pipeline.
 
 Your pitch must include a live demo.
 
@@ -213,11 +213,10 @@ Your pitch must include a live demo.
 
 | Dimension | Weight |
 |---|---|
-| Technical execution | 25% |
-| Evidence quality | 25% |
-| Product clarity | 20% |
-| Human-in-the-loop design | 15% |
-| Communication | 15% |
+| Technical execution | 50% |
+| Evidence quality | 20% |
+| Product clarity | 10% |
+| Communication | 10% |
 
 ## Deliverables
 
@@ -226,5 +225,5 @@ Submit before your pitch slot:
 - PyLabRobot protocol file(s)
 - Image classification pipeline code and any trained model weights
 - Culture Monitor upload script or integration code
-- A one-page data summary: runs performed, singles counts, pipeline performance metrics
+- Data summary: runs performed, singles counts, pipeline performance metrics
 - Pitch slides or equivalent (PDF)
