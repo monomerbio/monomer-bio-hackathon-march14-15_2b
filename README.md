@@ -145,6 +145,23 @@ Use **comments** to give the reviewing scientist additional context:
 
 This way the human reviewer opens Culture Monitor, sees the status label at a glance, and can read the comment for details before making a final QC decision.
 
+### Viewing Images via the MCP
+
+The MCP also exposes observation images, which is useful for inspecting wells without leaving your MCP client or for feeding images into your classification pipeline programmatically.
+
+**Interactive preview** — use when you want to inspect an image inline (e.g. in Cursor or Claude Code):
+
+- `get_observation_image(culture_id, dataset_id=None)` — returns an inline image preview (when within size budget) plus metadata with a `webapp` link to open the well in Culture Monitor.
+
+**Programmatic access** — use when your code needs stable download URLs (e.g. for ML pipelines or batch downloads):
+
+- `get_observation_image_access(culture_id, dataset_id=None)` — returns presigned `download_urls` (`standard_url`, `large_url`) with expiry metadata, plus `webapp` handoff fields.
+
+**Notes:**
+- Presigned URLs are ephemeral — refresh them after expiry.
+- For human inspection, prefer the `webapp.path` link to open the well in Culture Monitor.
+- You can also use `get_plate_observations(plate_id=..., dataset_limit=...)` to get a dataset-level summary of all observations on a plate, including a `csv_resource_uri` for raw well-by-well measurement data.
+
 ### Sample Prompt
 
 Once your classification pipeline has produced per-well labels, you can use natural language to prompt the server to assign the appropriate labels and post relevant comments. 
