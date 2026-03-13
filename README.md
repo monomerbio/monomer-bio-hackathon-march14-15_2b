@@ -6,7 +6,7 @@
 
 ---
 
-# Setup
+# Setup: OT-2 and PyLabRobot
 
 ## 1. Python environment
 
@@ -41,7 +41,15 @@ Replace with your robot's actual IP.
 | **Cephla Squid** | Images the seeded plate. Make sure to label your experiment ID in the Squid software before imaging. Only square scan shapes are supported for the Monomer data agent. |
 | **Monomer Culture Monitor** | Human-in-the-loop review of classified wells. Log in at [cloud-staging.monomerbio.com](https://cloud-staging.monomerbio.com/). |
 
-## 4. Connect to the Monomer Cloud MCP
+---
+
+# Setup: Connect to the Monomer Cloud MCP
+
+If you haven't already been onboarded to our system, we will need your email. Monomer staff will stop by after Phase 1 to collect your information, and shortly after this you will receive an email invitation to the [Monomer Culture Monitor](https://cloud-staging.monomerbio.com/).
+
+**NOTE:** If you have a Google account, you may navigate directly to the [Culture Monitor](https://cloud-staging.monomerbio.com/), click **Log In** and then select **Continue with Google**. You will still need to give your email to Monomer Staff so that we can add you to the correct team.
+
+Please make sure you are fully onboarded before proceeding.
 
 The Monomer Cloud MCP is your primary method for interacting with plates and cultures programmatically. For this track, **use the MCP to upload classification results and update culture statuses** rather than the Culture Monitor UI directly. (You should still get familiar with the UI so you know how scientists will interact with the system.)
 
