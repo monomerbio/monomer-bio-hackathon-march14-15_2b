@@ -1,6 +1,6 @@
 # Track B: Develop an AI-Assisted Human-in-the-Loop Workflow for Single Cell Cloning
 
-**Leads:** Rick Wierenga ([rick@monomerbio.com](mailto:rick@monomerbio.com)) / Will Pierce ([will@monomerbio.com](mailto:will@monomerbio.com))
+**Leads:** [Will Pierce](http://linkedin.com/in/williamcpier/) / [Rick Wierenga](http://linkedin.com/in/rickwierenga/)
 
 **Goal:** Build an AI-assisted workflow that dilutes and plates a bead suspension (cell proxy) to maximise single-bead wells in a 96-well plate, images the plate, classifies each well with ML, and supports human review via Monomer's Culture Monitor.
 
@@ -202,28 +202,3 @@ The problem statement defines inputs, outputs, and integration points. Everythin
 - What threshold determines whether a well is flagged vs. automatically accepted?
 - How does a reviewer interact with the Culture Monitor upload?
 - What are the failure modes of your pipeline, and how would a user know when to distrust it?
-
-## Pitch Format
-
-**10 minutes total: pitch and demo.** How you allocate the time is up to you. You're building and pitching a product, not just a working pipeline.
-
-Your pitch must include a live demo.
-
-## Judging Criteria
-
-| Dimension | Weight |
-|---|---|
-| Technical execution | 50% |
-| Evidence quality | 20% |
-| Product clarity | 10% |
-| Communication | 10% |
-
-## Deliverables
-
-Submit before your pitch slot:
-
-- PyLabRobot protocol file(s)
-- Image classification pipeline code and any trained model weights
-- Culture Monitor upload script or integration code
-- Data summary: runs performed, singles counts, pipeline performance metrics
-- Pitch slides or equivalent (PDF)
