@@ -33,6 +33,13 @@ export OT2_HOST=192.168.1.1
 
 Replace with your robot's actual IP.
 
+> **Simulation mode:** Setting `OT2_HOST=simulate` runs the method locally without connecting to a physical robot. This will catch Python runtime errors and predict some — but not all — robot-level errors (e.g. tip pickup failures or labware collisions may not be detected until the method runs on real hardware).
+>
+> ```bash
+> export OT2_HOST=simulate
+> python monomer_example.py
+> ```
+
 ## 3. Software stack
 
 | Platform | Role |
@@ -172,7 +179,7 @@ The MCP also exposes observation images, which is useful for inspecting wells wi
 
 ### Sample Prompt
 
-Once your classification pipeline has produced per-well labels, you can use natural language to prompt the server to assign the appropriate labels and post relevant comments. 
+Once your classification pipeline has produced per-well labels, you can use natural language to prompt the server to assign the appropriate labels and post relevant comments.
 
 If you're feeling ambitious, you can use a prompt like the following to upload results via the MCP in a single shot:
 
