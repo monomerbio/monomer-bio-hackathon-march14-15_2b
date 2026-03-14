@@ -1,6 +1,6 @@
 # Track B: Develop an AI-Assisted Human-in-the-Loop Workflow for Single Cell Cloning
 
-**Leads:** Rick Wierenga ([rick@monomerbio.com](mailto:rick@monomerbio.com)) / Will Pierce ([will@monomerbio.com](mailto:will@monomerbio.com))
+**Leads:** Will Pierce ([will@monomerbio.com](mailto:will@monomerbio.com)) / Rick Wierenga ([rick@pylabrobot.org](mailto:rick@pylabrobot.org))
 
 **Goal:** Build an AI-assisted workflow that dilutes and plates a bead suspension (cell proxy) to maximise single-bead wells in a 96-well plate, images the plate, classifies each well with ML, and supports human review via Monomer's Culture Monitor.
 
